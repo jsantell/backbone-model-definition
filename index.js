@@ -11,18 +11,18 @@ function executeSet (schemaModel, attrs, context) {
   }, { values: {}, errors: {}});
 }
 
-module.exports = function ModelMixin (BackboneModel, schema, options) {
+module.exports = function ModelMixin (ModelPrototype, schema, options) {
   var schemaModel = SchemaModel(schema, options);
-  var bbGet = BackboneModel.prototype.get;
-  var bbSet = BackboneModel.prototype.set;
+  var BaseGet = ModelPrototype.get;
+  var BaseSet = ModelPrototype.set;
 
   return BackboneModel.extend({
     get: function (prop) {
-      return schemaModel.get(prop, bbGet.call(this, prop));
+      return schemaModel.get(prop, BaseGet.call(this, prop));
     },
 
     set: function (key, value, options) {
-      var attrs, _this = this;
+      var attrs;
 
       if (typeof key === "object") {
         attrs = key;
@@ -34,12 +34,12 @@ module.exports = function ModelMixin (BackboneModel, schema, options) {
 
       var results = executeSet(schemaModel, attrs, this);
 
-      if (_.keys(results.errors).length) {
+      if (options.validate && _.keys(results.errors).length) {
         this.validationError = results.errors;
         this.trigger("invalid", this, results.errors, _.extend(options, { validationError: results.errors}));
         return false;
       } else {
-        return bbSet.call(this, results.values, options);
+        return BaseSet.call(this, results.values, options);
       }
     },
 

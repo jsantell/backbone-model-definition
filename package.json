@@ -1,7 +1,7 @@
 {
   "name": "backbone-model-definition",
   "description": "Model definitions for Backbone, providing validation and mutators.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./index.js",
   "dependencies": {
     "underscore": "1.4.x",
