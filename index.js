@@ -16,7 +16,7 @@ module.exports = function ModelMixin (ModelPrototype, schema, options) {
   var BaseGet = ModelPrototype.get;
   var BaseSet = ModelPrototype.set;
 
-  return BackboneModel.extend({
+  return {
     get: function (prop) {
       return schemaModel.get(prop, BaseGet.call(this, prop));
     },
@@ -51,5 +51,5 @@ module.exports = function ModelMixin (ModelPrototype, schema, options) {
         return results.errors;
       }
     }
-  });
+  };
 };
