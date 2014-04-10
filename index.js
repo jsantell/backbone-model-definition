@@ -1,14 +1,31 @@
-var _ = require("underscore");
 var SchemaModel = require("mongoose-schema-model");
 
+function keys (obj) {
+  var k = [];
+  for (var key in obj) k.push(key);
+  return k;
+}
+
+function eachKey (obj, fn) {
+  for (var key in obj)
+    fn(key, obj[key]);
+}
+
+function extend (obj, src) {
+  for (var prop in src)
+    obj[prop] = src[prop];
+  return obj;
+}
+
 function executeSet (schemaModel, attrs, context) {
-  return _.reduce(attrs, function (results, value, key) {
+  var results = { values: {}, errors: {} };
+  eachKey(attrs, function (key, value) {
     var setResults = schemaModel.set(key, value, context);
     results.values[key] = setResults.value;
     if (setResults.error)
       results.errors[key] = setResults.error;
-    return results;
-  }, { values: {}, errors: {}});
+  });
+  return results;
 }
 
 module.exports = function ModelMixin (ModelPrototype, schema, options) {
@@ -34,9 +51,9 @@ module.exports = function ModelMixin (ModelPrototype, schema, options) {
 
       var results = executeSet(schemaModel, attrs, this);
 
-      if (options.validate && _.keys(results.errors).length) {
+      if (options.validate && keys(results.errors).length) {
         this.validationError = results.errors;
-        this.trigger("invalid", this, results.errors, _.extend(options, { validationError: results.errors}));
+        this.trigger("invalid", this, results.errors, extend(options, { validationError: results.errors}));
         return false;
       } else {
         return BaseSet.call(this, results.values, options);
@@ -45,7 +62,7 @@ module.exports = function ModelMixin (ModelPrototype, schema, options) {
 
     validate: function (attributes, options) {
       var results = executeSet(schemaModel, attributes, this);
-      if (_.keys(results.errors).length) {
+      if (keys(results.errors).length) {
         this.validationError = results.errors;
         this.trigger("invalid", this, results.errors, _.extend(options, { validationError: results.errors}));
         return results.errors;
