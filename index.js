@@ -64,7 +64,7 @@ module.exports = function ModelMixin (ModelPrototype, schema, options) {
       var results = executeSet(schemaModel, attributes, this);
       if (keys(results.errors).length) {
         this.validationError = results.errors;
-        this.trigger("invalid", this, results.errors, _.extend(options, { validationError: results.errors}));
+        this.trigger("invalid", this, results.errors, extend(options, { validationError: results.errors}));
         return results.errors;
       }
     }
